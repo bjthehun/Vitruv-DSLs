@@ -28,6 +28,7 @@ class ReactionClassGenerator extends ClassGenerator {
 	static val EXECUTE_REACTION_METHOD_NAME = "executeReaction"
 	static val MATCH_CHANGE_METHOD_NAME = "isCurrentChangeMatchingTrigger"
 	static val USER_DEFINED_PRECONDITION_METHOD_NAME = "isUserDefinedPreconditionFulfilled"
+	static val GET_CHANGE_PROPAGATION_SPECIFICATION_COMPONENT_NAME_METHOD_NAME = "getComponentName"
 
 	final Reaction reaction
 	final ChangeTypeRepresentation changeType
@@ -66,6 +67,7 @@ class ReactionClassGenerator extends ClassGenerator {
 			members +=
 				reaction.toField(changeType.name, changeType.accessibleElement.generateTypeRef(_typeReferenceBuilder))
 			members += reaction.generateConstructor()
+			members += reaction.generateMethodGetReactionName()
 			members += routineCallClassGenerator.generateBody()
 			members += generateMethodExecuteReactionAndDependentMethods()
 		]
@@ -80,6 +82,15 @@ class ReactionClassGenerator extends ClassGenerator {
 				super(«routinesFacadeParameter.name»);
 			'''
 		]
+	}
+	
+	private def JvmOperation generateMethodGetReactionName(Reaction reaction) {
+		return reaction.toMethod(GET_CHANGE_PROPAGATION_SPECIFICATION_COMPONENT_NAME_METHOD_NAME, typeRef(String), [
+			visibility = JvmVisibility.PUBLIC
+			body = '''
+				return "«reaction.name»";
+			'''
+		])
 	}
 
 	private def Iterable<JvmOperation> generateMethodExecuteReactionAndDependentMethods() {
