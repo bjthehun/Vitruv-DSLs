@@ -28,7 +28,7 @@ class ReactionClassGenerator extends ClassGenerator {
 	static val EXECUTE_REACTION_METHOD_NAME = "executeReaction"
 	static val MATCH_CHANGE_METHOD_NAME = "isCurrentChangeMatchingTrigger"
 	static val USER_DEFINED_PRECONDITION_METHOD_NAME = "isUserDefinedPreconditionFulfilled"
-	static val GET_CHANGE_PROPAGATION_SPECIFICATION_COMPONENT_NAME_METHOD_NAME = "getComponentName"
+	static val GET_CHANGE_PROPAGATION_SPECIFICATION_COMPONENT_NAME_METHOD_NAME = "getRuleName"
 
 	final Reaction reaction
 	final ChangeTypeRepresentation changeType
@@ -49,7 +49,7 @@ class ReactionClassGenerator extends ClassGenerator {
 			new UpdateBlockClassGenerator(typesBuilderExtensionProvider, reactionClassQualifiedName + ".Call",
 				reaction.callRoutine, typeRef(routinesFacadeClassName), changeType.generatePropertiesParameterList)
 		} else {
-			new EmptyStepExecutionClassGenerator(typesBuilderExtensionProvider)
+			new EmptyStepExecutio nClassGenerator(typesBuilderExtensionProvider)
 		}
 	}
 
@@ -107,14 +107,15 @@ class ReactionClassGenerator extends ClassGenerator {
 			val facadeClassName = reaction.reactionsSegment.routinesFacadeClassNameGenerator.qualifiedName
 			body = '''
 				«facadeClassName» «ROUTINES_FACADE_VARIABLE» = («facadeClassName»)«ROUTINES_FACADE_VARIABLE»Untyped;
-				«generateMatchChangeMethodCallCode(matchChangeMethod, changeParameter.name)»
 				«changeType.generatePropertiesAssignmentCode»
 				«generateUserDefinedPreconditionMethodCall(userDefinedPreconditionMethod)»
+				executionState.getChangePropagationObservable().notifyFiringChangePropagationRule(this, change);
 				if (getLogger().isTraceEnabled()) {
 					getLogger().trace("Passed complete precondition check of Reaction " + this.getClass().getName());
 				}
 				
 				«generateCallRoutineCode»
+				executionState.getChangePropagationObservable().notifyAppliedChangePropagationRule(this, change);
 			'''
 		]
 		return #[matchChangeMethod, userDefinedPreconditionMethod, executeReactionMethod].filterNull
