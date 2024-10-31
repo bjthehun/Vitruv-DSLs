@@ -100,7 +100,7 @@ class BidirectionalExecutionTests extends ReactionsExecutionTest {
 		assertThat(propagatedChanges.size, is(2))
 		val consequentialSourceModelChange = propagatedChanges.get(0).sourceModelChanges
 		assertThat(consequentialSourceModelChange.EChanges.get(0), is(instanceOf(RemoveRootEObject)))
-		assertThat(consequentialSourceModelChange.EChanges.get(1), is(instanceOf(DeleteEObject)))
+		assertThat(consequentialSourceModelChange.EChanges.get(4), is(instanceOf(DeleteEObject)))
 		assertThat(resourceAt(SOURCE_MODEL), doesNotExist())
 		assertThat(resourceAt(TARGET_MODEL), doesNotExist())
 		assertThat(propagatedChanges.get(1).consequentialChanges.EChanges, is(emptyList))
